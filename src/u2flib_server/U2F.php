@@ -321,7 +321,7 @@ class U2F {
 			throw new Error("Unable to obtain a good source of randomness", ERR_BAD_RANDOM );
 		}
 
-		$challenge = U2F::base64u_encode( $challenge )
+		$challenge = U2F::base64u_encode( $challenge );
 
 		return $challenge;
 	}
