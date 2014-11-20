@@ -289,7 +289,7 @@ class U2F {
 	}
 
 	private static function pubkey_to_pem( $key ) {
-		if( strlen( $key ) != 65 || $key[0] != "\x04") {
+		if( strlen( $key ) != PUBKEY_LEN || $key[0] != "\x04") {
 			return null;
 		}
 
