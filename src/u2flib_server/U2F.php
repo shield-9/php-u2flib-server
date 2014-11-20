@@ -111,6 +111,18 @@ class U2F {
 	 * @return Registration|Error
 	 */
 	public function doRegister( $request, $response, $include_cert = true ) {
+		if( !is_object( $request ) ) {
+			throw new InvalidArgumentException('$request of doRegister() method only accepts object.');
+		}
+
+		if( !is_object( $response ) ) {
+			throw new InvalidArgumentException('$response of doRegister() method only accepts object.');
+		}
+
+		if( !is_bool( $include_cert ) ) {
+			throw new InvalidArgumentException('$include_cert of doRegister() method only accepts boolean.');
+		}
+
 		$rawReg     = U2F::base64u_decode( $response->registrationData );
 		$regData    = array_values( unpack('C*', $rawReg ) );
 		$clientData = U2F::base64u_decode( $response->clientData );
@@ -191,6 +203,10 @@ class U2F {
 		$sigs = array();
 
 		foreach( $registrations as $reg ) {
+			if( !is_object( $reg ) ) {
+				throw new InvalidArgumentException('$registrations of getAuthenticateData() method only accepts array of object.');
+			}
+
 			$sig            = new SignRequest();
 			$sig->appId     = $this->appId;
 			$sig->keyHandle = $reg->keyHandle;
@@ -223,12 +239,20 @@ class U2F {
 			throw new InvalidArgumentException('$registrations of doAuthenticate() method only accepts array.');
 		}
 
+		if( !is_object( $response ) ) {
+			throw new InvalidArgumentException('$response of doAuthenticate() method only accepts object.');
+		}
+
 		$req = null;
 		$reg = null;
 		$clientData = U2F::base64u_decode( $response->clientData );
 		$decodedClient = json_decode( $clientData );
 
 		foreach( $requests as $req ) {
+			if( !is_object( $req ) ) {
+				throw new InvalidArgumentException('$requests of doAuthenticate() method only accepts array of object.');
+			}
+
 			if( $req->keyHandle === $response->keyHandle && $req->challenge === $decodedClient->challenge ) {
 				break;
 			}
@@ -241,6 +265,10 @@ class U2F {
 		}
 
 		foreach ( $registrations as $reg ) {
+			if( !is_object( $reg ) ) {
+				throw new InvalidArgumentException('$registrations of doAuthenticate() method only accepts array of object.');
+			}
+
 			if( $reg->keyHandle === $response->keyHandle ) {
 				break;
 			}
