@@ -90,6 +90,10 @@ class U2F {
 	 * RegisterRequest the second being an array of SignRequest
 	 */
 	public function getRegisterData( $keyHandles = array() ) {
+		if( !is_array( $keyHandles ) ) {
+			throw new InvalidArgumentException('$keyHandles of getRegisterData() method only accepts array.');
+		}
+
 		$challenge = U2F::createChallenge();
 
 		$request = new RegisterRequest( $challenge, $this->appId );
@@ -180,6 +184,10 @@ class U2F {
 	 * @return array|Error An array of SignRequest
 	 */
 	public function getAuthenticateData( $registrations ) {
+		if( !is_array( $registrations ) ) {
+			throw new InvalidArgumentException('$registrations of getAuthenticateData() method only accepts array.');
+		}
+
 		$sigs = array();
 
 		foreach( $registrations as $reg ) {
@@ -207,6 +215,14 @@ class U2F {
 	 * token cloning or similar and appropriate action should be taken.
 	 */
 	public function doAuthenticate( $requests, $registrations, $response ) {
+		if( !is_array( $requests ) ) {
+			throw new InvalidArgumentException('$requestns of doAuthenticate() method only accepts array.');
+		}
+
+		if( !is_array( $registrations ) ) {
+			throw new InvalidArgumentException('$registrations of doAuthenticate() method only accepts array.');
+		}
+
 		$req = null;
 		$reg = null;
 		$clientData = U2F::base64u_decode( $response->clientData );
