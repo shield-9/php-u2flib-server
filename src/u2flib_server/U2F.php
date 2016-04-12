@@ -488,6 +488,30 @@ class Registration
 }
 
 /**
+ * Class for a registered key
+ *
+ * @package u2flib_server
+ */
+class RegisteredKey
+{
+    /** Protocol version */
+    public $version;
+
+    /** The key handle of the registered authenticator */
+    public $keyHandle;
+
+    /**
+     * @param string $challenge
+     * @internal
+     */
+    public function __construct($keyHandle, $version = U2F_VERSION)
+    {
+        $this->keyHandle = $keyHandle;
+        $this->version   = $version;
+    }
+}
+
+/**
  * Error class, returned on errors
  *
  * @package u2flib_server
