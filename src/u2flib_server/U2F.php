@@ -231,19 +231,19 @@ class U2F
      */
     public function getAuthenticateData(array $registrations)
     {
-        $sigs = array();
+        $sign = new SignRequest();
+        $sign->appId = $this->appId;
+        $sign->challenge = $this->createChallenge();
+
         foreach ($registrations as $reg) {
             if( !is_object( $reg ) ) {
                 throw new \InvalidArgumentException('$registrations of getAuthenticateData() method only accepts array of object.');
             }
 
-            $sig = new SignRequest();
-            $sig->appId = $this->appId;
-            $sig->keyHandle = $reg->keyHandle;
-            $sig->challenge = $this->createChallenge();
-            $sigs[] = $sig;
+            $sign->registeredKeys[] = new RegisteredKey($reg->keyHandle);
         }
-        return $sigs;
+
+        return $sign;
     }
 
     /**
@@ -278,12 +278,15 @@ class U2F
 
         $clientData = $this->base64u_decode($response->clientData);
         $decodedClient = json_decode($clientData);
-        foreach ($requests as $req) {
+        if($requests->challenge !== $decodedClient->challenge) {
+            throw new Error('User-agent returned unexpected challenge.', ERR_BAD_UA_RETURNING );
+        }
+        foreach ($requests->registeredKeys as $req) {
             if( !is_object( $req ) ) {
                 throw new \InvalidArgumentException('$requests of doAuthenticate() method only accepts array of object.');
             }
 
-            if($req->keyHandle === $response->keyHandle && $req->challenge === $decodedClient->challenge) {
+            if($req->keyHandle === $response->keyHandle) {
                 break;
             }
 
@@ -466,7 +469,7 @@ class SignRequest
     public $challenge;
 
     /** Key handle of a registered authenticator */
-    public $keyHandle;
+    public $registeredKeys = array();
 
     /** Application id */
     public $appId;
