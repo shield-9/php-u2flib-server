@@ -117,10 +117,20 @@ class U2F
      */
     public function getRegisterData(array $registrations = array())
     {
-        $challenge = $this->createChallenge();
-        $request = new RegisterRequest($challenge, $this->appId);
-        $signs = $this->getAuthenticateData($registrations);
-        return array($request, $signs);
+        $register = new \stdClass;
+        $register->challenge = $this->createChallenge();
+        $register->registerRequests = new RegisterRequest($challenge);
+        $register->registeredKeys = array();
+
+        foreach ($registrations as $reg) {
+            if( !is_object( $reg ) ) {
+                throw new \InvalidArgumentException('$registrations of getRegisterData() method only accepts array of object.');
+            }
+
+            $register->registeredKeys[] = new RegisteredKey($reg->keyHandle);
+        }
+
+        return $register;
     }
 
     /**
@@ -432,18 +442,13 @@ class RegisterRequest
     /** Registration challenge */
     public $challenge;
 
-    /** Application id */
-    public $appId;
-
     /**
      * @param string $challenge
-     * @param string $appId
      * @internal
      */
-    public function __construct($challenge, $appId)
+    public function __construct($challenge)
     {
         $this->challenge = $challenge;
-        $this->appId = $appId;
     }
 }
 
